@@ -33,14 +33,14 @@
             class="btn btn-success"
             [disabled]="!f.form.valid"
           >
-            {{ editMode.isTrue ? "Update" : "Add" }}
+            {{ editMode ? "Update" : "Add" }}
           </button>
           <button
             style="margin-right: 2px"
             type="button"
             class="btn btn-danger"
             (click)="onDelete()"
-            [disabled]="!editMode.isTrue"
+            [disabled]="!editMode"
           >
             Delete
           </button>

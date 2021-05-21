@@ -12,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
 import { ShoppingRoutingModule } from './shopping/shopping-routing.module';
 import { AuthRoutingModule } from './auth/auth-routing.module';
 import { AppRoutingModule } from './app-routing.modules';
+import { StoreModule } from '@ngrx/store';
+import { shoppingReducer } from './shopping/shopping.reducer';
 
 @NgModule({
   declarations: [AppComponent, HeaderComponent],
@@ -25,6 +27,7 @@ import { AppRoutingModule } from './app-routing.modules';
     RecipesModule,
     ShoppingModule,
     DirectivesModule,
+    StoreModule.forRoot({ shopping: shoppingReducer }),
   ],
   providers: [
     {
