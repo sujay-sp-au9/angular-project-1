@@ -71,7 +71,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.loading = true;
       const { email, password, confirmPassword } = this.form.value;
       this.authService.authenticate(email, password, confirmPassword).subscribe(
-        (data) => {
+        () => {
           this.form.reset();
           this.loading = false;
         },

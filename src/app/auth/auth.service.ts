@@ -1,10 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { User } from './user.modal';
 import { environment } from '../../environments/environment';
+import { Store } from '@ngrx/store';
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from './store/auth.actions';
 
 const signupURL = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${environment.api_key}`;
 const signiURL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${environment.api_key}`;
@@ -20,8 +23,11 @@ interface AuthInterfaceData {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  user: BehaviorSubject<User> = new BehaviorSubject(null);
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private store: Store<fromApp.AppState>
+  ) {}
   private handleError(err) {
     let error = 'An unknown error occurred';
     if (!err.error || !err.error.error || !err.error.error.message) {
@@ -47,7 +53,14 @@ export class AuthService {
       new Date().getTime() + Number(expiresIn) * 1000
     );
     const user = new User(email, localId, idToken, expirationDate);
-    this.user.next(user);
+    this.store.dispatch(
+      new AuthActions.Login({
+        email,
+        id: localId,
+        token: idToken,
+        expirationDate,
+      })
+    );
     localStorage.setItem('user', JSON.stringify(user));
     this.router.navigate(['/recipe']);
   }
@@ -92,15 +105,22 @@ export class AuthService {
       _token,
       new Date(_tokenExpirationDate)
     );
-    if (loadedUser.token) {
-      this.user.next(loadedUser);
+    if (loadedUser && loadedUser.token) {
+      this.store.dispatch(
+        new AuthActions.Login({
+          email,
+          id,
+          token: _token,
+          expirationDate: new Date(_tokenExpirationDate),
+        })
+      );
       this.router.navigate(['/recipe']);
     } else {
       this.router.navigate(['/auth']);
     }
   }
   logOut() {
-    this.user.next(null);
+    this.store.dispatch(new AuthActions.Logout());
     localStorage.removeItem('user');
     this.router.navigate(['/auth']);
   }

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { Ingredient } from '../../shared/ingredient.model';
 import * as ShoppingActions from '../shopping.actions';
-import { State } from '../shopping.reducer';
+import * as fromApp from '../../store/app.reducer';
 
 @Component({
   selector: 'app-shopping-item-edit',
@@ -15,7 +15,7 @@ export class ShoppingItemEditComponent implements OnInit, OnDestroy {
   @ViewChild('f') form: NgForm;
   shoppingSub: Subscription;
   editMode = false;
-  constructor(private store: Store<{ shopping: State }>) {}
+  constructor(private store: Store<fromApp.AppState>) {}
   ngOnInit() {
     this.shoppingSub = this.store.select('shopping').subscribe((data) => {
       if (data.editor >= 0) {

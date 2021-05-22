@@ -13,7 +13,7 @@ import { ShoppingRoutingModule } from './shopping/shopping-routing.module';
 import { AuthRoutingModule } from './auth/auth-routing.module';
 import { AppRoutingModule } from './app-routing.modules';
 import { StoreModule } from '@ngrx/store';
-import { shoppingReducer } from './shopping/shopping.reducer';
+import * as fromApp from './store/app.reducer';
 
 @NgModule({
   declarations: [AppComponent, HeaderComponent],
@@ -27,7 +27,7 @@ import { shoppingReducer } from './shopping/shopping.reducer';
     RecipesModule,
     ShoppingModule,
     DirectivesModule,
-    StoreModule.forRoot({ shopping: shoppingReducer }),
+    StoreModule.forRoot(fromApp.appReducers),
   ],
   providers: [
     {
