@@ -4,14 +4,15 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ViewContainerRef,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AlertComponent } from '../shared/alert/alert.component';
-import { PlaceholderDirective } from '../shared/placeholder/placeholder.directive';
-import { AuthService } from './auth.service';
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from './store/auth.actions';
 
 @Component({
   selector: 'app-auth',
@@ -19,16 +20,19 @@ import { AuthService } from './auth.service';
   styleUrls: ['./auth.component.css'],
 })
 export class AuthComponent implements OnInit, OnDestroy {
-  loginModeEvent: Subject<boolean>;
   loginMode: boolean = true;
+  loginModeEvent: Subject<boolean>;
   form: FormGroup;
   loading: boolean = false;
+  loginSub: Subscription;
   private errorCloseSub: Subscription;
-  @ViewChild(PlaceholderDirective) error: PlaceholderDirective;
+  @ViewChild('containerToHostDynamicallyInjectedComponents', {
+    read: ViewContainerRef,
+  })
+  errorContainer: ViewContainerRef;
   constructor(
-    private authService: AuthService,
-    private router: Router,
-    private componentFactoryResolver: ComponentFactoryResolver
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private store: Store<fromApp.AppState>
   ) {}
   ngOnInit(): void {
     this.loginModeEvent = new Subject();
@@ -62,25 +66,25 @@ export class AuthComponent implements OnInit, OnDestroy {
         );
       }
     });
+    this.loginSub = this.store
+      .select('auth')
+      .subscribe(({ error, loading }) => {
+        this.loading = loading;
+        if (error) {
+          this.showError(error);
+        }
+      });
   }
   onSwitchMode() {
     this.loginModeEvent.next(!this.loginMode);
   }
   onSubmit() {
     if (this.form.valid) {
-      this.loading = true;
       const { email, password, confirmPassword } = this.form.value;
-      this.authService.authenticate(email, password, confirmPassword).subscribe(
-        () => {
-          this.form.reset();
-          this.loading = false;
-        },
-        (err) => {
-          this.showError(err);
-          this.form.reset();
-          this.loading = false;
-        }
+      this.store.dispatch(
+        new AuthActions.LoginStart({ email, password, confirmPassword })
       );
+      this.form.reset();
     } else {
       return;
     }
@@ -88,7 +92,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   private showError(message) {
     const alertComponentFactory =
       this.componentFactoryResolver.resolveComponentFactory(AlertComponent);
-    const hostViewContainerRef = this.error.viewContainerRef;
+    const hostViewContainerRef = this.errorContainer;
     hostViewContainerRef.clear();
     const componentRef = hostViewContainerRef.createComponent(
       alertComponentFactory
@@ -106,5 +110,6 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.errorCloseSub.unsubscribe();
     }
     this.loginModeEvent.unsubscribe();
+    this.loginSub.unsubscribe();
   }
 }

@@ -14,6 +14,8 @@ import { AuthRoutingModule } from './auth/auth-routing.module';
 import { AppRoutingModule } from './app-routing.modules';
 import { StoreModule } from '@ngrx/store';
 import * as fromApp from './store/app.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { AuthEffects } from './auth/store/auth.effects';
 
 @NgModule({
   declarations: [AppComponent, HeaderComponent],
@@ -28,6 +30,7 @@ import * as fromApp from './store/app.reducer';
     ShoppingModule,
     DirectivesModule,
     StoreModule.forRoot(fromApp.appReducers),
+    EffectsModule.forRoot([AuthEffects]),
   ],
   providers: [
     {
