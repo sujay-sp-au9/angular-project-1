@@ -4,6 +4,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ViewContainerRef,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,7 +25,10 @@ export class AuthComponent implements OnInit, OnDestroy {
   form: FormGroup;
   loading: boolean = false;
   private errorCloseSub: Subscription;
-  @ViewChild(PlaceholderDirective) error: PlaceholderDirective;
+  @ViewChild('containerToHostDynamicallyInjectedComponents', {
+    read: ViewContainerRef,
+  })
+  errorContainer: ViewContainerRef;
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -89,7 +93,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   private showError(message) {
     const alertComponentFactory =
       this.componentFactoryResolver.resolveComponentFactory(AlertComponent);
-    const hostViewContainerRef = this.error.viewContainerRef;
+    const hostViewContainerRef = this.errorContainer;
     hostViewContainerRef.clear();
     const componentRef = hostViewContainerRef.createComponent(
       alertComponentFactory

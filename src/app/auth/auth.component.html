@@ -8,7 +8,7 @@
       [message]="error"
       (close)="errorRead()"
     ></app-alert> -->
-    <ng-template appPlaceholder></ng-template>
+    <ng-template #containerToHostDynamicallyInjectedComponents></ng-template>
     <div *ngIf="loading"><app-loading-spinner></app-loading-spinner></div>
     <form (ngSubmit)="onSubmit()" [formGroup]="form">
       <div class="form-group">
