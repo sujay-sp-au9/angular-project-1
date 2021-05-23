@@ -7,11 +7,9 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AlertComponent } from '../shared/alert/alert.component';
-import { PlaceholderDirective } from '../shared/placeholder/placeholder.directive';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -31,7 +29,6 @@ export class AuthComponent implements OnInit, OnDestroy {
   errorContainer: ViewContainerRef;
   constructor(
     private authService: AuthService,
-    private router: Router,
     private componentFactoryResolver: ComponentFactoryResolver
   ) {}
   ngOnInit(): void {
