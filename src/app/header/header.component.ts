@@ -7,9 +7,9 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { DataStorageService } from '../shared/data-storage.service';
 import * as fromApp from '../store/app.reducer';
 import * as AuthActions from '../auth/store/auth.actions';
+import * as RecipeActions from '../recipe/store/recipe.actions';
 
 @Component({
   selector: 'app-header',
@@ -23,20 +23,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   propagateClickToUL() {
     this.ReceiveClickFromButton.nativeElement.click();
   }
-  constructor(
-    private dataStorageService: DataStorageService,
-    private store: Store<fromApp.AppState>
-  ) {}
+  constructor(private store: Store<fromApp.AppState>) {}
   ngOnInit() {
     this.userSub = this.store.select('auth').subscribe(({ user }) => {
       this.loggedIn = !!user;
     });
   }
   saveData() {
-    this.dataStorageService.storeRecipes();
+    this.store.dispatch(new RecipeActions.StoreRecipes());
   }
   fetchData() {
-    this.dataStorageService.fetchRecipes().subscribe();
+    this.store.dispatch(new RecipeActions.FetchRecipes());
   }
   logOut() {
     this.store.dispatch(new AuthActions.Logout());
